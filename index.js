@@ -30,6 +30,13 @@ client.connect(err => {
       })
     })
 
+    app.get('/products/:id', (req, res) => {
+      productCollection.find({id:req.params._id})
+      .toArray((err, items) => {
+          res.send(items[0])
+      })
+    })
+
     app.post('/admin', (req, res) => {
       const newProduct = req.body;
       console.log('Adding new product',newProduct);
