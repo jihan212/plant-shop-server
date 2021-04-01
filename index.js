@@ -19,24 +19,46 @@ const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 client.connect(err => {
     console.log('Connection error',err);
-  const collection = client.db("GreenPlant").collection("product");
 
-  app.get('/products', (req, res) => {
-      collection.find()
+// Product collection ------
+    const productCollection = client.db("GreenPlant").collection("product");
+
+    app.get('/products', (req, res) => {
+      productCollection.find()
       .toArray((err, items) => {
           res.send(items)
       })
-  })
+    })
 
-  app.post('/admin', (req, res) => {
+    app.post('/admin', (req, res) => {
       const newProduct = req.body;
       console.log('Adding new product',newProduct);
-      collection.insertOne(newProduct)
+      productCollection.insertOne(newProduct)
       .then(result => {
           console.log('Inserted count', result.insertedCount);
           res.send(result.insertedCount > 0)
       })
-  })
+    })
+
+// Order collection 
+    const orderCollection = client.db("GreenPlant").collection("order");
+
+    app.post('/addOrder', (req, res) => {
+      const newOrder = req.body;
+      orderCollection.insertOne(newOrder)
+      .then (result => {
+        console.log(result);
+      })
+      console.log(newOrder);
+    })
+
+    app.get('/order', (req, res) => {
+      console.log(req.query.email);
+      orderCollection.find({email: req.query.email})
+      .toArray((err , documents) => {
+        res.send(documents)
+      })
+    })
 
 //   client.close();
 });
