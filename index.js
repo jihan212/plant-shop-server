@@ -31,10 +31,17 @@ client.connect(err => {
     })
 
     app.get('/products/:id', (req, res) => {
-      productCollection.find({_id:(req.params.id)})
+      productCollection.find()
       .toArray((err, items) => {
-          console.log(items)
-          res.send(items[0])
+        const id = req.params.id;
+        const product = items.find(i=> {
+          return i._id == id
+      })
+        if (!product){
+          return res.status(404).send({message:"not found"})
+        } else {
+          return res.status(200).send(product)
+        }
       })
     })
 
