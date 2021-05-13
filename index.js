@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const MongoClient = require('mongodb').MongoClient;
+const ObjectID = require('mongodb').ObjectID;
 const cors = require('cors');
 const bodyParser = require('body-parser');
 require('dotenv').config()
@@ -68,12 +69,28 @@ client.connect(err => {
     })
 
     app.get('/order', (req, res) => {
-      console.log(req.query.email);
       orderCollection.find({email: req.query.email})
       .toArray((err , documents) => {
         res.send(documents)
       })
     })
+
+    app.get('/orders', (req, res) => {
+      orderCollection.find()
+      .toArray((err, items) => {
+          res.send(items)
+      })
+    })
+
+    app.delete('/deleteOrder/:id', (req, res) => {
+      const id = ObjectID(req.params.id);
+      console.log('Delete this', id);
+      orderCollection.deleteOne({_id: id})
+      .then (result => {
+        console.log(result);
+      })
+    })
+
 
 //   client.close();
 });
